@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
-const XLSX = require('xlsx');
+// const XLSX = require('xlsx');
 
 const getProductList = async (pageNum) => {
   const browser = await puppeteer.launch({
@@ -17,7 +17,7 @@ const getProductList = async (pageNum) => {
   // "https://www.goodchoice.kr/product/search/2" URL에 접속한다. (여기어때 호텔 페이지)
   let productList = [];
 
-  await page.goto(`https://th.iherb.com/c/categories?p=${pageNum}`);
+  await page.goto(`https://kr.iherb.com/c/categories?p=${pageNum}`);
 
   const content = await page.content();
   // $에 cheerio를 로드한다.
@@ -39,6 +39,7 @@ const getProductList = async (pageNum) => {
     const price = $(list).find('span.price').text().trim();
 
     productList.push({
+      page: pageNum,
       name,
       prodUrl,
       rating,
@@ -48,12 +49,14 @@ const getProductList = async (pageNum) => {
     });
   });
 
-  const workSheet = XLSX.utils.json_to_sheet(productList);
-  const workBook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workBook, workSheet, 'Sheet 1');
-  XLSX.writeFile(workBook, `./temp/sample_${new Date().toDateString()}.xlsx`);
+  // const workSheet = XLSX.utils.json_to_sheet(productList);
+  // const workBook = XLSX.utils.book_new();
+  // XLSX.utils.book_append_sheet(workBook, workSheet, 'Sheet 1');
+  // XLSX.writeFile(workBook, `./temp/sample_${new Date().toDateString()}.xlsx`);
 
   browser.close();
+
+  return productList;
 };
 
 module.exports = { getProductList };
